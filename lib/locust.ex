@@ -21,6 +21,9 @@ defmodule Locust do
 
     print_success_rate(result)
     print_times(result)
+    if num_of_workers > 1 do
+      print_concurrency(result)
+    end
   end
 
   defp run_workers(url, num_of_workers, num_of_requests) do
@@ -54,6 +57,20 @@ defmodule Locust do
     IO.puts "   Min: #{min} ms"
     IO.puts "   Avg: #{avg} ms"
   end
+
+  defp print_concurrency(result) do
+    times = Enum.map(result, fn(x) -> elem(x, 1) end) |> Enum.map(fn(x) -> x/1000 end)
+    start = Enum.map(result, fn(x) -> elem(x, 2) end) |> Enum.map(fn(x) -> x/1000 end) |> Enum.min
+    finish = Enum.map(result, fn(x) -> elem(x, 3) end) |> Enum.map(fn(x) -> x/1000 end) |> Enum.max
+    total_duration = finish - start
+    sum_of_times = Enum.sum(times)
+    requests = length(result)
+    IO.puts "Concurrency:"
+    IO.puts "   Time of all requests:  #{sum_of_times}"
+    IO.puts "   Total duration:        #{total_duration}"
+    IO.puts "   Concurrency level:     #{sum_of_times/total_duration}"
+    IO.puts "   Requests per second:   #{(total_duration*1000)/requests}"
+  end
 end
 
 defmodule Worker do
@@ -65,8 +82,11 @@ defmodule Worker do
   end
 
   defp work(url, agent, requests_to_do) do
-    {time, response} = :timer.tc(HTTPotion, :get, url)
-    Agent.update(agent, fn list -> [{response.status_code, time}|list] end)
+    start = :erlang.system_time()/1000
+    response = HTTPotion.get(url)
+    finish = :erlang.system_time()/1000
+    time = finish - start
+    Agent.update(agent, fn list -> [{response.status_code, time, start, finish}|list] end)
     work(url, agent, requests_to_do - 1)
   end
 end
