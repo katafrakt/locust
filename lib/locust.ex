@@ -19,10 +19,14 @@ defmodule Locust do
 
     result = run_workers(url, num_of_workers, num_of_requests)
 
-    print_success_rate(result)
-    print_times(result)
-    if num_of_workers > 1 do
-      print_concurrency(result)
+    successful_results = Enum.filter(result, fn(x) -> elem(x, 0) == 200 end)
+    print_success_rate(successful_results, result)
+
+    if length(successful_results) > 0 do
+      print_times(successful_results)
+      if num_of_workers > 1 do
+        print_concurrency(successful_results)
+      end
     end
   end
 
@@ -51,9 +55,9 @@ defmodule Locust do
     ProgressBar.render(length(results), total, format)
   end
 
-  defp print_success_rate(result) do
-    success = Enum.count(result, fn(x) -> elem(x, 0) == 200 end)
+  defp print_success_rate(successful, result) do
     all = length(result)
+    success = length(successful)
     IO.puts "Success: #{success}/#{all} (#{success/all * 100}%)"
   end
 
@@ -92,11 +96,15 @@ defmodule Worker do
   end
 
   defp work(url, agent, requests_to_do) do
-    start = :erlang.system_time()/1000
-    response = HTTPotion.get(url)
-    finish = :erlang.system_time()/1000
-    time = finish - start
-    Agent.update(agent, fn list -> [{response.status_code, time, start, finish}|list] end)
+    try do
+      start = :erlang.system_time()/1000
+      response = HTTPotion.get(url)
+      finish = :erlang.system_time()/1000
+      time = finish - start
+      Agent.update(agent, fn list -> [{response.status_code, time, start, finish}|list] end)
+    rescue
+      HTTPotion.HTTPError -> Agent.update(agent, fn(list) -> [{0, 0, 0, 0}|list] end)
+    end
     work(url, agent, requests_to_do - 1)
   end
 end
