@@ -30,7 +30,8 @@ defmodule Locust.Mixfile do
   defp deps do
     [
       {:ibrowse, "~> 4.2.2"},
-      {:httpotion, "~> 2.1.0"}
+      {:httpotion, "~> 2.1.0"},
+      {:progress_bar, "> 0.0.0"}
     ]
   end
 end

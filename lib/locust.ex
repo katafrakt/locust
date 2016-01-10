@@ -29,16 +29,26 @@ defmodule Locust do
   defp run_workers(url, num_of_workers, num_of_requests) do
     {:ok, agent} = Agent.start_link(fn -> [] end)
     workers = for _ <- 1..num_of_workers, do: spawn fn -> Worker.call(agent, url, num_of_requests) end
-    wait_for_workers(workers)
+    wait_for_workers(workers, agent, num_of_requests * num_of_workers)
     Agent.get(agent, fn list -> list end)
   end
 
-  defp wait_for_workers(workers) do
+  defp wait_for_workers(workers, agent, total) do
+    print_progress_bar(agent, total)
     aliveness = Enum.map(workers, fn(x) -> Process.alive?(x) end)
     if Enum.any?(aliveness, fn(x) -> x == true end) do
       :timer.sleep(20)
-      wait_for_workers(workers)
+      wait_for_workers(workers, agent, total)
     end
+  end
+
+  defp print_progress_bar(agent, total) do
+    results = Agent.get(agent, fn(list) -> list end)
+    format = [
+      bar_color: [IO.ANSI.white, IO.ANSI.green_background],
+      blank_color: IO.ANSI.yellow_background,
+    ]
+    ProgressBar.render(length(results), total, format)
   end
 
   defp print_success_rate(result) do
