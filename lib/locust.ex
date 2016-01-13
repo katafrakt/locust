@@ -20,13 +20,13 @@ defmodule Locust do
     num_of_workers = opts[:concurrency] || 1
     num_of_requests = opts[:number] || 10
 
-    results = run_workers(url, num_of_workers, num_of_requests)
+    results = run_workers(url, num_of_workers, num_of_requests, opts)
     Reporter.render(results, num_of_workers)
   end
 
-  defp run_workers(url, num_of_workers, num_of_requests) do
+  defp run_workers(url, num_of_workers, num_of_requests, opts) do
     {:ok, agent} = Agent.start_link(fn -> [] end)
-    workers = for _ <- 1..num_of_workers, do: spawn fn -> Worker.call(agent, url, num_of_requests) end
+    workers = for _ <- 1..num_of_workers, do: spawn fn -> Worker.call(agent, url, num_of_requests, opts) end
     wait_for_workers(workers, agent, num_of_requests * num_of_workers)
     Agent.get(agent, fn list -> list end)
   end
