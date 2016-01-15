@@ -9,7 +9,7 @@ defmodule Locust do
   defp parse_args(args) do
     {options, url, _} = OptionParser.parse(args,
       switches: [number: :integer, concurrency: :integer],
-      aliases: [n: :number, c: :concurrency]
+      aliases: [n: :number, c: :concurrency, h: :help]
     )
     {options, url}
   end
@@ -19,9 +19,13 @@ defmodule Locust do
     opts = elem(args, 0)
     num_of_workers = opts[:concurrency] || 1
     num_of_requests = opts[:number] || 10
+    if opts[:help] do
+      print_help()
+    end
 
     opts = Dict.put(opts, :total_requests, num_of_requests * num_of_workers)
 
+    IO.puts "Spawning locust swarm..."
     results = run_workers(url, num_of_workers, num_of_requests, opts)
     Reporter.render(results, num_of_workers)
   end
@@ -49,5 +53,23 @@ defmodule Locust do
       blank_color: IO.ANSI.yellow_background,
     ]
     ProgressBar.render(length(results), total, format)
+  end
+
+  defp print_help() do
+    IO.puts """
+      Usage:
+        locust [host] [options]
+
+        Example: locust http://localhost:8080 -c 20 -n 200
+
+      Options:
+        -h --help             Print help (this message)
+        -n --number           Number of requests to perform by each worker.
+                              Default: 10
+        -c --concurrency      Number of workers to spawn. Default: 1.
+        --keep-alive          (experimental) use 'Connection: keep-alive' header
+                              instead of default 'Connection: close'
+    """
+    System.halt(0)
   end
 end
