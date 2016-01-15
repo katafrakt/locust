@@ -15,10 +15,12 @@ defmodule Locust do
   end
 
   defp process(args) do
-    url = elem(args, 1)
+    url = List.first(elem(args, 1))
     opts = elem(args, 0)
     num_of_workers = opts[:concurrency] || 1
     num_of_requests = opts[:number] || 10
+
+    opts = Dict.put(opts, :total_requests, num_of_requests * num_of_workers)
 
     results = run_workers(url, num_of_workers, num_of_requests, opts)
     Reporter.render(results, num_of_workers)
