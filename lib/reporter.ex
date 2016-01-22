@@ -22,10 +22,12 @@ defmodule Reporter do
     max = Enum.max(times)
     min = Enum.min(times)
     avg = Enum.sum(times)/length(times)
+    iqrm = Statistics.trimmed_mean(times, :iqr)
     IO.puts "Times:"
-    IO.puts "   Max: #{format_number(max)} ms"
-    IO.puts "   Min: #{format_number(min)} ms"
-    IO.puts "   Avg: #{format_number(avg)} ms"
+    IO.puts "   Max:      #{format_number(max)} ms"
+    IO.puts "   Min:      #{format_number(min)} ms"
+    IO.puts "   Avg:      #{format_number(avg)} ms"
+    IO.puts "   IQR mean: #{format_number(iqrm)} ms"
   end
 
   defp print_concurrency(result) do

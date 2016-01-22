@@ -31,7 +31,8 @@ defmodule Locust.Mixfile do
     [
       {:ibrowse, "~> 4.2.2"},
       {:httpotion, "~> 2.1.0"},
-      {:progress_bar, "> 0.0.0"}
+      {:progress_bar, "> 0.0.0"},
+      {:statistics, "~> 0.4.0"}
     ]
   end
 end
