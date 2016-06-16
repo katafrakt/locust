@@ -18,22 +18,22 @@ defmodule Reporter do
   end
 
   defp print_times(result) do
-    times = Enum.map(result, fn(x) -> elem(x, 1) end) |> Enum.map(fn(x) -> x/1000 end)
-    max = Enum.max(times)
-    min = Enum.min(times)
-    avg = Enum.sum(times)/length(times)
-    iqrm = Statistics.trimmed_mean(times, :iqr)
+    times = result |> Enum.map(&elem(&1, 1)) |> Enum.map(&(&1/1000))
+    max_val = Enum.max(times)
+    min_val = Enum.min(times)
+    avg_val = Enum.sum(times)/length(times)
+    iqrm_val = Statistics.trimmed_mean(times, :iqr)
     IO.puts "Times:"
-    IO.puts "   Max:      #{format_number(max)} ms"
-    IO.puts "   Min:      #{format_number(min)} ms"
-    IO.puts "   Avg:      #{format_number(avg)} ms"
-    IO.puts "   IQR mean: #{format_number(iqrm)} ms"
+    IO.puts "   Max:      #{format_number(max_val)} ms"
+    IO.puts "   Min:      #{format_number(min_val)} ms"
+    IO.puts "   Avg:      #{format_number(avg_val)} ms"
+    IO.puts "   IQR mean: #{format_number(iqrm_val)} ms"
   end
 
   defp print_concurrency(result) do
-    times = Enum.map(result, fn(x) -> elem(x, 1) end) |> Enum.map(fn(x) -> x/1000 end)
-    start = Enum.map(result, fn(x) -> elem(x, 2) end) |> Enum.map(fn(x) -> x/1000 end) |> Enum.min
-    finish = Enum.map(result, fn(x) -> elem(x, 3) end) |> Enum.map(fn(x) -> x/1000 end) |> Enum.max
+    times = result |> Enum.map(&elem(&1, 1)) |> Enum.map(&(&1/1000))
+    start = result |> Enum.map(&elem(&1, 2)) |> Enum.map(&(&1/1000)) |> Enum.min
+    finish = result |> Enum.map(&elem(&1, 3)) |> Enum.map(&(&1/1000)) |> Enum.max
     total_duration = finish - start
     sum_of_times = Enum.sum(times)
     requests = length(result)
