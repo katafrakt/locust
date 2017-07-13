@@ -41,7 +41,7 @@ defmodule Reporter do
     IO.puts "   Time of all requests:  #{format_number(sum_of_times)} ms"
     IO.puts "   Total duration:        #{format_number(total_duration)} ms"
     IO.puts "   Concurrency level:     #{format_number(sum_of_times/total_duration)}"
-    IO.puts "   Requests per second:   #{format_number((total_duration*1000)/requests)} req/s"
+    IO.puts "   Requests per second:   #{format_number(requests/(total_duration/1000))} req/s"
   end
 
   defp format_number(num) do
