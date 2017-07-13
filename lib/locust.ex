@@ -8,8 +8,8 @@ defmodule Locust do
 
   defp parse_args(args) do
     {options, url, _} = OptionParser.parse(args,
-      switches: [number: :integer, concurrency: :integer],
-      aliases: [n: :number, c: :concurrency, h: :help]
+      switches: [number: :integer, concurrency: :integer, header: :keep],
+      aliases: [n: :number, c: :concurrency, h: :help, H: :header]
     )
     {options, url}
   end
@@ -19,15 +19,25 @@ defmodule Locust do
     opts = elem(args, 0)
     num_of_workers = opts[:concurrency] || 1
     num_of_requests = opts[:number] || 10
+    headers = opts |>  Keyword.get_values(:header) |> parse_headers
     if opts[:help] do
       print_help()
     end
 
-    opts = Dict.put(opts, :total_requests, num_of_requests * num_of_workers)
+    opts = Keyword.put(opts, :total_requests, num_of_requests * num_of_workers)
+    |> Keyword.put(:headers, headers)
 
     IO.puts "Spawning locust swarm..."
     results = run_workers(url, num_of_workers, num_of_requests, opts)
     Reporter.render(results, num_of_workers)
+  end
+
+  defp parse_headers(headers_array) do
+    Enum.map(headers_array, fn(h) ->
+      [key, value] = String.split(h, ":")
+      {String.to_atom(key), value}
+    end)
+    |> Keyword.new
   end
 
   defp run_workers(url, num_of_workers, num_of_requests, opts) do

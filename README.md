@@ -27,6 +27,7 @@ Locust accepts those as options:
 * `-n --number` – Number of requests to perform by each worker. Default is 10.
 * `-c --concurrency` – Number of workers to spawn. This is one by default. Be careful with large values as it might induce heavy load of your system (not to mention server). In my experience setting values higher than **1000** might be risky.
 * `--keep-alive` _(experimental)_ –  Use `Connection: keep-alive` header instead of default `Connection: close`. This does not make much sense as simulation of real-life situation, as real people usually take time before making following requests. This also proved to cause locust unstable with high concurrency level (even lower than **1000** mentioned above).
+* `-H --header` – Add headers to each request. Format is `header:value`, so for example `-H X-Access-Token:abx55ds`. Can be used multiple times.
 
 ## Sample output
 

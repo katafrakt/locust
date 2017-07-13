@@ -11,7 +11,8 @@ defmodule Worker do
     size = opts[:total_requests] || 10_000
     try do
       start = :erlang.system_time()/1000
-      response = HTTPotion.get(url, [headers: ['Connection': connection_header], ibrowse: [max_pipeline_size: size, max_sessions: size]])
+      headers = Keyword.put(opts[:headers], String.to_atom("Connection"), connection_header)
+      response = HTTPotion.get(url, [headers: headers, ibrowse: [max_pipeline_size: size, max_sessions: size]])
       finish = :erlang.system_time()/1000
       time = finish - start
       Agent.update(agent, fn list -> [{response.status_code, time, start, finish}|list] end)
