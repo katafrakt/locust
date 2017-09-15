@@ -12,12 +12,21 @@ defmodule Worker do
     try do
       start = :erlang.system_time()/1000
       headers = Keyword.put(opts[:headers], String.to_atom("Connection"), connection_header)
-      response = HTTPotion.get(url, [headers: headers, ibrowse: [max_pipeline_size: size, max_sessions: size]])
+      verb = String.to_atom(opts[:request_type] || "get")
+
+      options = [headers: headers, ibrowse: [max_pipeline_size: size, max_sessions: size]]
+      if opts[:body] do
+        options = Keyword.put(options, :body, opts[:body])
+      end
+
+      response = HTTPotion.request(verb, url, options)
+
       finish = :erlang.system_time()/1000
       time = finish - start
       Agent.update(agent, fn list -> [{response.status_code, time, start, finish}|list] end)
     rescue
-      HTTPotion.HTTPError -> Agent.update(agent, fn(list) -> [{0, 0, 0, 0}|list] end)
+      HTTPotion.HTTPError ->
+        #Agent.update(agent, fn(list) -> [{0, 0, 0, 0}|list] end)
     end
     work(url, agent, requests_to_do - 1, opts)
   end

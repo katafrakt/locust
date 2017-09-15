@@ -1,6 +1,6 @@
 defmodule Reporter do
   def render(result, num_of_workers) do
-    successful_results = Enum.filter(result, fn(x) -> elem(x, 0) == 200 end)
+    successful_results = Enum.filter(result, fn(x) -> elem(x, 0) >= 200 && elem(x, 0) < 300 end)
     print_success_rate(successful_results, result)
 
     if length(successful_results) > 0 do

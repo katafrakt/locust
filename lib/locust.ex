@@ -8,8 +8,14 @@ defmodule Locust do
 
   defp parse_args(args) do
     {options, url, _} = OptionParser.parse(args,
-      switches: [number: :integer, concurrency: :integer, header: :keep],
-      aliases: [n: :number, c: :concurrency, h: :help, H: :header]
+      switches: [
+        number: :integer,
+        concurrency: :integer,
+        header: :keep,
+        request_type: :string,
+        body: :string
+      ],
+      aliases: [n: :number, c: :concurrency, h: :help, H: :header, t: :request_type, b: :body]
     )
     {options, url}
   end
