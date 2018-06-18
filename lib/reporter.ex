@@ -1,6 +1,7 @@
 defmodule Reporter do
-  def render(result, num_of_workers) do
-    successful_results = Enum.filter(result, fn(x) -> elem(x, 0) >= 200 && elem(x, 0) < 300 end)
+  def render(result, num_of_workers, opts) do
+    high_limit_of_status = if (opts[:accept_redirects]), do: 400, else: 300
+    successful_results = Enum.filter(result, fn(x) -> elem(x, 0) >= 200 && elem(x, 0) < high_limit_of_status end)
     print_success_rate(successful_results, result)
 
     if length(successful_results) > 0 do

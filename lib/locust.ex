@@ -13,7 +13,8 @@ defmodule Locust do
         concurrency: :integer,
         header: :keep,
         request_type: :string,
-        body: :string
+        body: :string,
+        accept_redirects: :boolean
       ],
       aliases: [n: :number, c: :concurrency, h: :help, H: :header, t: :request_type, b: :body]
     )
@@ -35,7 +36,7 @@ defmodule Locust do
 
     IO.puts "Spawning locust swarm..."
     results = run_workers(url, num_of_workers, num_of_requests, opts)
-    Reporter.render(results, num_of_workers)
+    Reporter.render(results, num_of_workers, opts)
   end
 
   defp parse_headers(headers_array) do
@@ -83,6 +84,7 @@ defmodule Locust do
         -n --number           Number of requests to perform by each worker.
                               Default: 10
         -c --concurrency      Number of workers to spawn. Default: 1.
+        --accept-redirects    Whether or not tread redirects as correct status. Default: false
         --keep-alive          (experimental) use 'Connection: keep-alive' header
                               instead of default 'Connection: close'
     """
