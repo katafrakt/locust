@@ -1,6 +1,6 @@
 defmodule Reporter do
   def render(result, num_of_workers, opts) do
-    high_limit_of_status = if (opts[:accept_redirects]), do: 400, else: 300
+    high_limit_of_status = if opts[:accept_redirects], do: 400, else: 300
     successful_results = Enum.filter(result, fn(x) -> elem(x, 0) >= 200 && elem(x, 0) < high_limit_of_status end)
     print_success_rate(successful_results, result)
 
@@ -22,7 +22,7 @@ defmodule Reporter do
     times = result |> Enum.map(&elem(&1, 1)) |> Enum.map(&(&1/1000))
     max_val = Enum.max(times)
     min_val = Enum.min(times)
-    avg_val = Enum.sum(times)/length(times)
+    avg_val = Enum.sum(times) / length(times)
     iqrm_val = Statistics.trimmed_mean(times, :iqr)
     IO.puts "Times:"
     IO.puts "   Max:      #{format_number(max_val)} ms"

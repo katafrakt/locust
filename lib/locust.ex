@@ -31,7 +31,8 @@ defmodule Locust do
       print_help()
     end
 
-    opts = Keyword.put(opts, :total_requests, num_of_requests * num_of_workers)
+    opts = opts
+    |> Keyword.put(:total_requests, num_of_requests * num_of_workers)
     |> Keyword.put(:headers, headers)
 
     IO.puts "Spawning locust swarm..."
@@ -40,7 +41,8 @@ defmodule Locust do
   end
 
   defp parse_headers(headers_array) do
-    Enum.map(headers_array, fn(h) ->
+    headers_array
+    |> Enum.map(fn(h) ->
       [key, value] = String.split(h, ":")
       {String.to_atom(key), value}
     end)

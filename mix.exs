@@ -8,7 +8,7 @@ defmodule Locust.Mixfile do
      escript: [main_module: Locust],
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
-     deps: deps]
+     deps: deps()]
   end
 
   # Configuration for the OTP application

@@ -10,7 +10,7 @@ defmodule Worker do
     connection_header = if opts[:keep_alive], do: 'keep-alive', else: 'close'
     size = opts[:total_requests] || 10_000
     try do
-      start = :erlang.system_time()/1000
+      start = :erlang.system_time() / 1000
       headers = Keyword.put(opts[:headers], String.to_atom("Connection"), connection_header)
       verb = String.to_atom(opts[:request_type] || "get")
 
@@ -21,7 +21,7 @@ defmodule Worker do
 
       response = HTTPotion.request(verb, url, options)
 
-      finish = :erlang.system_time()/1000
+      finish = :erlang.system_time() / 1000
       time = finish - start
       Agent.update(agent, fn list -> [{response.status_code, time, start, finish}|list] end)
     rescue
