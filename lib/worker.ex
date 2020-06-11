@@ -27,6 +27,7 @@ defmodule Worker do
     rescue
       HTTPotion.HTTPError ->
         #Agent.update(agent, fn(list) -> [{0, 0, 0, 0}|list] end)
+        nil
     end
     work(url, agent, requests_to_do - 1, opts)
   end
